@@ -119,7 +119,7 @@ a{
 }
 
 a:hover {
-  text-decoration: underline;  /* Opcional: subrayado al pasar */
-  color: #c559b7;              /* O el color que prefieras */
+  text-decoration: underline;
+  color: #c559b7;  
 }
 
