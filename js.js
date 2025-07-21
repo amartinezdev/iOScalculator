@@ -1,5 +1,7 @@
 let operacionMarcada = false;
 let operacionFinalizada = false;
+let ultimoResultado = "";
+let dotter = true;
 
 const clear = document.querySelector("#clear");
 const borrar = document.querySelector("#delete");
@@ -29,118 +31,71 @@ const equal = document.querySelector("#equals");
 const write = document.querySelector(".write");
 const operation = document.querySelector(".operation");
 
-// buttons
+// operandos
 zero.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "0";
-  } else {
-    clearAll();
-    write.innerHTML += "0";
-    operacionFinalizada = false;
-  }
+  introducirOperando("0");
 });
 
 one.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "1";
-  } else {
-    clearAll();
-    write.innerHTML += "1";
-    operacionFinalizada = false;
-  }
+  introducirOperando("1");
 });
 
 two.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "2";
-  } else {
-    clearAll();
-    write.innerHTML += "2";
-    operacionFinalizada = false;
-  }
+  introducirOperando("2");
 });
 
 three.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "3";
-  } else {
-    clearAll();
-    write.innerHTML += "3";
-    operacionFinalizada = false;
-  }
+  introducirOperando("3");
 });
 
 four.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "4";
-  } else {
-    clearAll();
-    write.innerHTML += "4";
-    operacionFinalizada = false;
-  }
+  introducirOperando("4");
 });
 
 five.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "5";
-  } else {
-    clearAll();
-    write.innerHTML += "5";
-    operacionFinalizada = false;
-  }
+  introducirOperando("5");
 });
 
 six.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "6";
-  } else {
-    clearAll();
-    write.innerHTML += "6";
-    operacionFinalizada = false;
-  }
+  introducirOperando("6");
 });
 
 seven.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "7";
-  } else {
-    clearAll();
-    write.innerHTML += "7";
-    operacionFinalizada = false;
-  }
+  introducirOperando("7");
 });
 
 eight.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "8";
-  } else {
-    clearAll();
-    write.innerHTML += "8";
-    operacionFinalizada = false;
-  }
+  introducirOperando("8");
 });
 
 nine.addEventListener("click", () => {
-  if (!operacionFinalizada) {
-    write.innerHTML += "9";
-  } else {
-    clearAll();
-    write.innerHTML += "9";
-    operacionFinalizada = false;
-  }
+  introducirOperando("9");
 });
 
 // para que solo se pueda poner 1 punto
-let dotter = true;
 dot.addEventListener("click", () => {
   if (operacionFinalizada) {
     clearAll();
     operacionFinalizada = false;
   }
 
-  if (dotter) {
-    dotter = false;
-    if (write.innerHTML.length == 0) {
+  const res = write.innerHTML;
+  let numeroActual = "";
+  let encontrado = false;
+
+  // recorre hacia atrás hasta encontrar un operador
+  // si lo encuentra, el bucle se para y comprueba si hay ya un punto o no.
+  for (let i = res.length - 1; i >= 0 && !encontrado; i--) {
+    const char = res[i];
+    if ("+-*/%".includes(char)) {
+      encontrado = true;
+    }
+    numeroActual = char + numeroActual;
+  }
+
+  // Si el número actual no tiene punto, se añade
+  if (!numeroActual.includes(".")) {
+    if (numeroActual === "") {
       write.innerHTML += "0.";
     } else {
       write.innerHTML += ".";
@@ -166,37 +121,25 @@ borrar.addEventListener("click", () => {
   write.innerHTML = write.innerHTML.slice(0, -1);
 });
 
-// operandos
+// operadores
 plus.addEventListener("click", () => {
-  if (!operacionMarcada) {
-    write.innerHTML += "+";
-    operacionMarcada = true;
-  }
+  introducirOperador("+");
 });
 
 minus.addEventListener("click", () => {
-  if (!operacionMarcada) {
-    write.innerHTML += "-";
-    operacionMarcada = true;
-  }
+  introducirOperador("-");
 });
 
 mult.addEventListener("click", () => {
-  if (!operacionMarcada) {
-    write.innerHTML += "*";
-    operacionMarcada = true;
-  }
+  introducirOperador("*");
 });
 
 divide.addEventListener("click", () => {
-  if (!operacionMarcada) {
-    write.innerHTML += "/";
-    operacionMarcada = true;
-  }
+  introducirOperador("/");
 });
 
 module.addEventListener("click", () => {
-  masiva("%");
+  introducirOperador("%");
 });
 
 // operación
@@ -213,7 +156,9 @@ function result() {
   } else if (resultado == "") {
     resultado = "";
   } else {
-    write.innerHTML = Math.round(eval(resultado) * 100) / 100;
+    const res = Math.round(eval(resultado) * 100) / 100;
+    write.innerHTML = res;
+    ultimoResultado = res;
     operacionMarcada = false;
     operacionFinalizada = true;
     dotter = true;
@@ -226,12 +171,26 @@ function clearAll() {
 }
 
 /**
- * testeo, si funciona, pereza cambiarlo
+ * introduce operando en la calculadora
  * @param {*} operando
  */
-function masiva(operando) {
-  if (!operacionMarcada) {
-    write.innerHTML += `${operando}`;
+function introducirOperando(operando) {
+  if (operacionFinalizada) {
+    clearAll();
+    write.innerHTML += operando;
+    operacionFinalizada = false;
+  } else {
+    write.innerHTML += operando;
+  }
+}
+
+function introducirOperador(operador) {
+  if (operacionFinalizada) {
+    operacionFinalizada = false;
+    write.innerHTML += `${operador}`;
+    operacionMarcada = true;
+  } else if (!operacionMarcada) {
+    write.innerHTML += `${operador}`;
     operacionMarcada = true;
   }
 }
