@@ -185,6 +185,8 @@ function result() {
 function clearAll() {
   write.innerHTML = "";
   operation.innerHTML = "";
+  operacionMarcada = false;
+  operacionFinalizada = true;
 }
 
 /**
