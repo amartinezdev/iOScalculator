@@ -165,6 +165,9 @@ function result() {
   }
 }
 
+/**
+ * realiza la limpieza de la ventana
+ */
 function clearAll() {
   write.innerHTML = "";
   operation.innerHTML = "";
@@ -184,6 +187,10 @@ function introducirOperando(operando) {
   }
 }
 
+/**
+ * añade un operador, sólo si no hay ninguno añadido anteriormente
+ * @param {*} operador
+ */
 function introducirOperador(operador) {
   if (operacionFinalizada) {
     operacionFinalizada = false;
