@@ -72,7 +72,7 @@ nine.addEventListener("click", () => {
   introducirOperando("9");
 });
 
-// para que solo se pueda poner 1 punto
+// para que solo se pueda poner 1 punto en cada número
 dot.addEventListener("click", () => {
   if (operacionFinalizada) {
     clearAll();
@@ -82,6 +82,7 @@ dot.addEventListener("click", () => {
   const res = write.innerHTML;
   let numeroActual = "";
   let encontrado = false;
+  let operador = false;
 
   // recorre hacia atrás hasta encontrar un operador
   // si lo encuentra, el bucle se para y comprueba si hay ya un punto o no.
@@ -89,13 +90,14 @@ dot.addEventListener("click", () => {
     const char = res[i];
     if ("+-*/%".includes(char)) {
       encontrado = true;
+      operador = true;
     }
     numeroActual = char + numeroActual;
   }
 
-  // Si el número actual no tiene punto, se añade
+  // si el número actual no tiene punto, se añade
   if (!numeroActual.includes(".")) {
-    if (numeroActual === "") {
+    if (numeroActual === "" || operador) {
       write.innerHTML += "0.";
     } else {
       write.innerHTML += ".";
@@ -112,12 +114,24 @@ negative.addEventListener("click", () => {
   const res = document.querySelector(".write").innerHTML;
   const ult = res.charAt(res.length - 1);
 
+  // solamente deja escribir números negativos al principio,
+  // o después de un operador
   if (res === "" || ult === "+" || ult === "*" || ult === "/") {
     write.innerHTML += "-";
   }
 });
 
 borrar.addEventListener("click", () => {
+  const res = write.innerHTML;
+
+  // comprueba si se ha borrado un operador, si lo ha borrado,
+  // marca el booleano como false para poder volver a marcarlo.
+  for (let i = 0; i < res.length; i++) {
+    if ("/*+-".includes(res[i])) {
+      operacionMarcada = false;
+    }
+  }
+
   write.innerHTML = write.innerHTML.slice(0, -1);
 });
 
@@ -154,8 +168,10 @@ function result() {
     operacionFinalizada = true;
     dotter = true;
   } else if (resultado == "") {
-    resultado = "";
+    // no se hace nada
+    write.innerHTML = "";
   } else {
+    // se realiza la operación y se devuelven los booleanos a su valor inicial
     const res = Math.round(eval(resultado) * 100) / 100;
     write.innerHTML = res;
     ultimoResultado = res;
@@ -192,12 +208,14 @@ function introducirOperando(operando) {
  * @param {*} operador
  */
 function introducirOperador(operador) {
-  if (operacionFinalizada) {
-    operacionFinalizada = false;
-    write.innerHTML += `${operador}`;
-    operacionMarcada = true;
-  } else if (!operacionMarcada) {
-    write.innerHTML += `${operador}`;
-    operacionMarcada = true;
+  if (write.innerHTML != "") {
+    if (operacionFinalizada) {
+      operacionFinalizada = false;
+      write.innerHTML += `${operador}`;
+      operacionMarcada = true;
+    } else if (!operacionMarcada) {
+      write.innerHTML += `${operador}`;
+      operacionMarcada = true;
+    }
   }
 }

@@ -120,6 +120,7 @@ a{
 
 a:hover {
   text-decoration: underline;
-  color: #c559b7;
+  color: #e2bd43;
+  font-weight: bold;
 }
 
