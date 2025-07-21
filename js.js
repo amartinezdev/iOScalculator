@@ -82,7 +82,6 @@ dot.addEventListener("click", () => {
   const res = write.innerHTML;
   let numeroActual = "";
   let encontrado = false;
-  let operador = false;
 
   // recorre hacia atrás hasta encontrar un operador
   // si lo encuentra, el bucle se para y comprueba si hay ya un punto o no.
@@ -90,14 +89,13 @@ dot.addEventListener("click", () => {
     const char = res[i];
     if ("+-*/%".includes(char)) {
       encontrado = true;
-      operador = true;
     }
     numeroActual = char + numeroActual;
   }
 
   // si el número actual no tiene punto, se añade
   if (!numeroActual.includes(".")) {
-    if (numeroActual === "" || operador) {
+    if (numeroActual === "") {
       write.innerHTML += "0.";
     } else {
       write.innerHTML += ".";
