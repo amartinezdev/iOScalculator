@@ -151,31 +151,209 @@ divide.addEventListener("click", () => {
 });
 
 module.addEventListener("click", () => {
-  introducirOperador("%");
+  if (operacionFinalizada) {
+    clearAll();
+    operacionFinalizada = false;
+  }
+
+  const texto = write.innerHTML;
+  const ultimoChar = texto[texto.length - 1];
+
+  if (!isNaN(parseInt(ultimoChar))) {
+    console.log("");
+    write.innerHTML += "%";
+  }
 });
 
-// operación
-function result() {
-  const resultado = document.querySelector(".write").innerHTML;
-  operation.innerHTML = resultado;
+// function result() {
+//   let expr = write.innerHTML;
+//   operation.innerHTML = expr;
 
-  if (resultado.includes("/0")) {
+//   if (expr.includes("/0")) {
+//     write.innerHTML = "bro...";
+//     operacionMarcada = false;
+//     operacionFinalizada = true;
+//     return;
+//   }
+
+//   if (expr == "") {
+//     write.innerHTML = "";
+//   } else {
+//     // Si termina en %: buscar operador antes del porcentaje
+//     if (expr.endsWith("%")) {
+//       let sinPorcentaje = expr.slice(0, -1); // quita el %
+//       let operadores = ["+", "-", "*", "/"];
+//       let operadorIndex = -1;
+
+//       // busca el último operador (de derecha a izquierda)
+//       for (let i = sinPorcentaje.length - 1; i >= 0; i--) {
+//         if (operadores.includes(sinPorcentaje[i])) {
+//           operadorIndex = i;
+//         }
+//       }
+
+//       if (operadorIndex !== -1) {
+//         let num1 = parseFloat(sinPorcentaje.slice(0, operadorIndex));
+//         let operador = sinPorcentaje[operadorIndex];
+//         let num2 = parseFloat(sinPorcentaje.slice(operadorIndex + 1));
+
+//         let resultado = 0;
+
+//         switch (operador) {
+//           case "+":
+//             resultado = num1 + (num1 * num2) / 100;
+//             break;
+//           case "-":
+//             resultado = num1 - (num1 * num2) / 100;
+//             break;
+//           case "*":
+//             resultado = num1 * (num2 / 100);
+//             break;
+//           case "/":
+//             resultado = num1 / (num2 / 100);
+//             break;
+//         }
+
+//         resultado = Math.round(resultado * 100) / 100;
+//         write.innerHTML = resultado;
+//         ultimoResultado = resultado;
+//         operacionMarcada = false;
+//         operacionFinalizada = true;
+//         return;
+//       }
+//     }
+
+//     // Si no hay porcentaje, evalúa normalmente
+//     try {
+//       let res = Math.round(eval(expr) * 100) / 100;
+//       write.innerHTML = res;
+//       ultimoResultado = res;
+//       operacionMarcada = false;
+//       operacionFinalizada = true;
+//     } catch (err) {
+//       write.innerHTML = "0";
+//       operacionFinalizada = true;
+//     }
+//   }
+// }
+
+function result() {
+  let expr = write.innerHTML;
+  operation.innerHTML = expr;
+
+  if (expr.includes("/0")) {
     write.innerHTML = "bro...";
-    operation.innerHTML = resultado;
     operacionMarcada = false;
     operacionFinalizada = true;
-    dotter = true;
-  } else if (resultado == "") {
-    // no se hace nada
+    return;
+  }
+
+  if (expr == "") {
     write.innerHTML = "";
   } else {
-    // se realiza la operación y se devuelven los booleanos a su valor inicial
-    const res = Math.round(eval(resultado) * 100) / 100;
-    write.innerHTML = res;
-    ultimoResultado = res;
+    const operadores = ["+", "-", "*", "/"];
+    let operadorIndex = -1;
+
+    // Buscar operador (solo el primero que encuentre de izquierda a derecha)
+    for (let i = 0; i < expr.length; i++) {
+      if (operadores.includes(expr[i])) {
+        operadorIndex = i;
+        break;
+      }
+    }
+
+    if (operadorIndex === -1) {
+      // No hay operador, evalúa normalmente
+      try {
+        let res = Math.round(eval(expr) * 100) / 100;
+        write.innerHTML = res;
+      } catch {
+        write.innerHTML = "Error";
+      }
+      operacionFinalizada = true;
+      return;
+    }
+
+    // Extraer operandos
+    let leftPart = expr.slice(0, operadorIndex).trim();
+    let rightPart = expr.slice(operadorIndex + 1).trim();
+    let operador = expr[operadorIndex];
+
+    // Detectar si operandos tienen %
+    let leftIsPercent = leftPart.endsWith("%");
+    let rightIsPercent = rightPart.endsWith("%");
+
+    // Convertir operandos a números (quitando % si hay)
+    let num1 = leftIsPercent ? parseFloat(leftPart.slice(0, -1)) : parseFloat(leftPart);
+    let num2 = rightIsPercent ? parseFloat(rightPart.slice(0, -1)) : parseFloat(rightPart);
+
+    let resultado = 0;
+
+    if (leftIsPercent && rightIsPercent) {
+      // Ambos porcentajes, depende de la operación
+      switch (operador) {
+        case "+":
+          resultado = num1 / 100 + num2 / 100;
+          break;
+        case "-":
+          resultado = num1 / 100 - num2 / 100;
+          break;
+        case "*":
+          resultado = (num1 / 100) * (num2 / 100);
+          break;
+        case "/":
+          resultado = num1 / 100 / (num2 / 100);
+          break;
+      }
+      resultado = resultado * 100; // lo pasamos a porcentaje
+    } else if (rightIsPercent) {
+      // Solo el segundo es porcentaje
+      switch (operador) {
+        case "+":
+          resultado = num1 + (num1 * num2) / 100;
+          break;
+        case "-":
+          resultado = num1 - (num1 * num2) / 100;
+          break;
+        case "*":
+          resultado = num1 * (num2 / 100);
+          break;
+        case "/":
+          resultado = num1 / (num2 / 100);
+          break;
+      }
+    } else if (leftIsPercent) {
+      // Solo el primero es porcentaje
+      switch (operador) {
+        case "+":
+          resultado = num1 / 100 + num2;
+          break;
+        case "-":
+          resultado = num1 / 100 - num2;
+          break;
+        case "*":
+          resultado = (num1 / 100) * num2;
+          break;
+        case "/":
+          resultado = num1 / 100 / num2;
+          break;
+      }
+    } else {
+      // Ninguno es porcentaje, evalúa normal
+      try {
+        resultado = eval(expr);
+      } catch {
+        write.innerHTML = "0";
+        operacionFinalizada = true;
+        return;
+      }
+    }
+
+    resultado = Math.round(resultado * 100) / 100;
+    write.innerHTML = resultado;
+    ultimoResultado = resultado;
     operacionMarcada = false;
     operacionFinalizada = true;
-    dotter = true;
   }
 }
 
@@ -208,7 +386,7 @@ function introducirOperando(operando) {
  * @param {*} operador
  */
 function introducirOperador(operador) {
-  if (write.innerHTML != "") {
+  if (write.innerHTML != "" && write.innerHTML != "bro...") {
     if (operacionFinalizada) {
       operacionFinalizada = false;
       write.innerHTML += `${operador}`;
