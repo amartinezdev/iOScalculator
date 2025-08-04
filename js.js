@@ -268,7 +268,7 @@ function result() {
         let res = Math.round(eval(expr) * 100) / 100;
         write.innerHTML = res;
       } catch {
-        write.innerHTML = "Error";
+        write.innerHTML = "0";
       }
       operacionFinalizada = true;
       return;
